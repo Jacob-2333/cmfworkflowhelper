@@ -11,7 +11,7 @@ export function activate(context: vscode.ExtensionContext) {
 		'myWebview',//试图类型，必须是唯一的
 		'My Webview', //面板标题
 		vscode.ViewColumn.One,//显示在哪一列
-		{enableScripts: true}//面板配置
+		{ enableScripts: true }//面板配置
 	);
 
 	// 定时更新页面数据
@@ -34,6 +34,20 @@ export function activate(context: vscode.ExtensionContext) {
 				case "showMessage":
 					vscode.window.showInformationMessage(message.text);
 					break;
+				case "listEditors": {
+					let aa= vscode.window.showTextDocument(vscode.Uri.file('E:\\VS2024\\Vscode\\testfiles\\test2.json'))
+					aa.then(textEditor=>{
+						let text=textEditor.document.getText();
+						console.log(`text: ${text}`);
+						let editors = vscode.window.visibleTextEditors;
+						console.log(editors)
+						editors.forEach(editor => {
+							console.log(editor.document);
+						});
+
+					})
+					break;
+				}
 			}
 			console.log(message);
 			// vscode.window.showInformationMessage("message received from webview");
@@ -71,6 +85,7 @@ function getWebviewContent(cat: string) {
 	<body>
 	    <h1>Hello, Webview! ${cat}</h1>
 	    <button onclick="postMessageToExtension()">Send Message</button>
+	    <button onclick="listEditors()">List Editors</button>
 	    <script>
 			const vscode=acquireVsCodeApi();
 	        function postMessageToExtension() {
@@ -81,6 +96,11 @@ function getWebviewContent(cat: string) {
 					text:"Hello from Webview! acquireVsCodeApi();"
 				})
 	        }
+			function listEditors(){
+				vscode.postMessage({
+					command: "listEditors"
+				})
+			}
 	    </script>
 	</body>
 	</html>
