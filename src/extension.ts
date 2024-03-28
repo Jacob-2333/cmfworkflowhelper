@@ -11,14 +11,19 @@ export function activate(context: vscode.ExtensionContext) {
 	// vscode.window.createTreeView('nodeDependencies', {
 	// 	treeDataProvider: new NodeDependenciesProvider("F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper")
 	// });
-	const nodeDependenciesProvider = new NodeDependenciesProvider("F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper");
+	// const nodeDependenciesProvider = new NodeDependenciesProvider("F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper");
+	const nodeDependenciesProvider = new NodeDependenciesProvider("E:\\VS2024\\Vscode\\cmfworkflowhelper");
 	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
-	vscode.commands.registerCommand('nodeDependencies.refreshEntry', () =>{
+	vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => {
 		nodeDependenciesProvider.refresh();
-		console.log("my refresh")
+		console.log("my refresh");
 
-	}
-  );
+	});
+
+	// const viewContainer = vscode.window.registerTreeDataProvider('package-explorer', nodeDependenciesProvider);
+        // vscode.commands.registerCommand('myExtension.showView', () => {
+        //     vscode.commands.executeCommand('workbench.view.extension.myExtension');
+        // });
 
 	// my first webview
 	// 创建一个webview面板
@@ -61,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 					// editors.forEach(editor => {
 					// 	console.log(editor.document);
 					// });
-					let filePath = vscode.Uri.joinPath(vscode.Uri.file('F:\\VS2024\\MyVscodeExtension\\testfiles\\test2.json'));
+					let filePath = vscode.Uri.joinPath(vscode.Uri.file('E:\\VS2024\\Vscode\\cmfworkflowhelper\\resources\\test2.json'));
 					// let filePath = vscode.Uri.joinPath(vscode.Uri.parse('F:\\VS2024\\MyVscodeExtension\\testfiles\\'), 'newFile.txt');
 					try {
 						await fs.promises.writeFile(filePath.fsPath, `{"test":"test1"}`);

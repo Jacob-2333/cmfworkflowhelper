@@ -12,6 +12,21 @@
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "nodeDependencies",
+        "contents": "No node dependencies found [learn more](https://www.npmjs.com/).\n[Add Dependency](command:nodeDependencies.addEntry)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "package-explorer",
+          "title": "Package Explorer",
+          "icon": "resources/test2.svg"
+        }
+      ]
+    },
     "commands": [
       {
           "command": "nodeDependencies.refreshEntry",
@@ -22,15 +37,33 @@
           }
       },
       {
+        "command": "nodeDependencies.addEntry",
+        "title": "Add"
+      },
+      {
+        "command": "nodeDependencies.editEntry",
+        "title": "Edit",
+        "icon": {
+          "light": "resources/light/edit.svg",
+          "dark": "resources/dark/edit.svg"
+        }
+      },
+      {
+        "command": "nodeDependencies.deleteEntry",
+        "title": "Delete"
+      },
+      {
         "command": "cmfworkflowhelper.helloWorld!!!",
         "title": "Hello"
       }
     ],
     "views":{
-      "explorer": [
+      "package-explorer": [
         {
-          "id":"nodeDependencies",
-          "name":"Node Dependencies"
+          "id": "nodeDependencies",
+          "name": "Node Dependencies",
+          "icon": "resources/test.svg",
+          "contextualTitle": "Package Explorer"
         }
       ]
     },
@@ -40,10 +73,24 @@
               "command": "nodeDependencies.refreshEntry",
               "when": "view == nodeDependencies",
               "group": "navigation"
+          },
+          {
+            "command": "nodeDependencies.addEntry",
+            "when": "view == nodeDependencies"
           }
+      ],
+      "view/item/context": [
+        {
+          "command": "nodeDependencies.editEntry",
+          "when": "view == nodeDependencies",
+          "group": "inline"
+        },
+        {
+          "command": "nodeDependencies.deleteEntry",
+          "when": "view == nodeDependencies"
+        }
       ]
-  }
-  
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
