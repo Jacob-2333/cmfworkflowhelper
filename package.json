@@ -15,7 +15,11 @@
     "viewsWelcome": [
       {
         "view": "nodeDependencies",
-        "contents": "No node dependencies found [learn more](https://www.npmjs.com/).\n[Add Dependency](command:nodeDependencies.addEntry)"
+        "contents": "No node dependencies found [learn more] (https://www.npmjs.com/).\n[Add Dependency](command:nodeDependencies.addEntry)"
+      },
+      {
+        "view": "automationcontrollerlist",
+        "contents": "No AutomationController [learn more](https://www.npmjs.com/).\n[Config Token](command:automationcontrollerlist.configToken)\n[Load Controller](command:automationcontrollerlist.loadControllerList)"
       }
     ],
     "viewsContainers": {
@@ -24,17 +28,22 @@
           "id": "package-explorer",
           "title": "Package Explorer",
           "icon": "resources/test2.svg"
+        },
+        {
+          "id": "iot-workflow-code-editor",
+          "title": "Code editor",
+          "icon": "resources/iot.svg"
         }
       ]
     },
     "commands": [
       {
-          "command": "nodeDependencies.refreshEntry",
-          "title": "MyRefresh",
-          "icon": {
-              "light": "resources/light/refresh.svg",
-              "dark": "resources/dark/refresh.svg"
-          }
+        "command": "nodeDependencies.refreshEntry",
+        "title": "MyRefresh",
+        "icon": {
+          "light": "resources/light/refresh.svg",
+          "dark": "resources/dark/refresh.svg"
+        }
       },
       {
         "command": "nodeDependencies.addEntry",
@@ -53,11 +62,15 @@
         "title": "Delete"
       },
       {
-        "command": "cmfworkflowhelper.helloWorld!!!",
-        "title": "Hello"
+        "command": "automationcontrollerlist.loadControllerList",
+        "title": "LoadControllerList"
+      },
+      {
+        "command": "automationcontrollerlist.configToken",
+        "title": "ConfigToken"
       }
     ],
-    "views":{
+    "views": {
       "package-explorer": [
         {
           "id": "nodeDependencies",
@@ -65,19 +78,27 @@
           "icon": "resources/test.svg",
           "contextualTitle": "Package Explorer"
         }
+      ],
+      "iot-workflow-code-editor": [
+        {
+          "id": "automationcontrollerlist",
+          "name": "Automation Controller List",
+          "icon": "resources/controller.svg",
+          "contextualTitle": "Controller Explorer"
+        }
       ]
     },
     "menus": {
       "view/title": [
-          {
-              "command": "nodeDependencies.refreshEntry",
-              "when": "view == nodeDependencies",
-              "group": "navigation"
-          },
-          {
-            "command": "nodeDependencies.addEntry",
-            "when": "view == nodeDependencies"
-          }
+        {
+          "command": "nodeDependencies.refreshEntry",
+          "when": "view == nodeDependencies",
+          "group": "navigation"
+        },
+        {
+          "command": "nodeDependencies.addEntry",
+          "when": "view == nodeDependencies"
+        }
       ],
       "view/item/context": [
         {
@@ -101,14 +122,18 @@
     "test": "vscode-test"
   },
   "devDependencies": {
-    "@types/vscode": "^1.87.0",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
+    "@types/vscode": "^1.87.0",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3",
     "@vscode/test-cli": "^0.0.6",
-    "@vscode/test-electron": "^2.3.9"
+    "@vscode/test-electron": "^2.3.9",
+    "eslint": "^8.56.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@types/axios": "^0.14.0",
+    "axios": "^1.6.8"
   }
 }
