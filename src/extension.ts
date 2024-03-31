@@ -3,12 +3,13 @@
 import * as vscode from 'vscode';
 import { NodeDependenciesProvider } from './NodeDependenciesProvider';
 import { CmfToken } from './cmftoken';
+import { Framework } from './framework';
+
+const framework=new Framework();
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-
-	const cmfToken=new CmfToken();
 
 	const nodeDependenciesProvider = new NodeDependenciesProvider("F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper");
 	// const nodeDependenciesProvider = new NodeDependenciesProvider("E:\\VS2024\\Vscode\\cmfworkflowhelper");
@@ -25,12 +26,6 @@ export function activate(context: vscode.ExtensionContext) {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
 		vscode.window.showInformationMessage('In this function, we will load controllers');
-		let token_endpoint=await cmfToken.getOpenidConfiguration();
-		console.log(token_endpoint);
-		let access_token=await cmfToken.getAccessToken(token_endpoint,"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRJZCI6Ik1FUyIsInRlbmFudE5hbWUiOiJCb3JnV2FybmVyU3V6aG91Iiwic3ViIjoiR0xPQkFMXFxCUkNBSSIsInNjb3BlIjpudWxsLCJleHRyYVZhbHVlcyI6bnVsbCwidHlwZSI6IlBBVCIsImlhdCI6MTcxMDMwNjI4MiwiZXhwIjoyMTQ1NTQyMzk5LCJhdWQiOiJBdXRoUG9ydGFsIiwiaXNzIjoiQXV0aFBvcnRhbCJ9.p6v5LWgoCMF5fpN6GG7rX4icsIxzQ8o4wHL3wxXq4bU");
-		console.log(access_token);
-		let messagebus_token=await cmfToken.getApplicationBootInformation(access_token);
-		console.log(messagebus_token);
 	});
 	
 	let disposable3 = vscode.commands.registerCommand('automationcontrollerlist.configToken', () => {
@@ -45,7 +40,25 @@ export function activate(context: vscode.ExtensionContext) {
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "cmfworkflowhelper" is now active!');
+	
+
+
+	framework.system.initialize().then(()=>{
+		const input = new framework.LBOS.Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByNameInput();
+		input.Name = "_ARRAY1702993198_30184";
+		input.LevelsToLoad = 0;
+		input.Type = "Material";
+
+		const res = framework.system.call(input);
+		res.then((result)=>{
+			result.Instance.Name;
+			console.log(JSON.stringify(result));
+		});
+	});
+
 }
+
+
 
 // This method is called when your extension is deactivated
 export function deactivate() { }

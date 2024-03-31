@@ -48,15 +48,40 @@ export class CmfToken {
         return res.MessageBusToken;
     }
 
+    public async systemCallPost(url: string, data: any, access_token: string): Promise<any> {
+        const res = await this.sendPostRequest(url, data, {
+            Authorization: `Bearer ${access_token}`
+        });
+        return res;
+    }
+
+    public async systemCallGet(url: string, data: any, access_token: string): Promise<any> {
+        const res = await this.sendGetRequest(url, data, {
+            Authorization: `Bearer ${access_token}`
+        });
+        return res;
+    }
+
     // 发送GET请求
-    public async sendGetRequest(url: string, headers?: any): Promise<any> {
+    public async sendGetRequest(url: string, params?: any, headers?: any): Promise<any> {
         try {
+            if(params){
+                if(Object.keys(params).length>0){
+                    url+="?";
+                }
+                for (const key of Object.keys(params)) {
+                    if(!key.startsWith('$')){
+                        url+=key+"="+params[key]+"&";
+                    }
+                }
+            }
             let _headers = this._requestDefaultHeaders;
             if (headers) {
                 for (const key of Object.keys(headers)) {
                     _headers[key] = headers[key];
                 }
             }
+            // console.log(JSON.stringify(_headers));
             // headers = headers ? headers : this._requestDefaultHeaders;
             const response: AxiosResponse<any> = await axios.get(url, {
                 headers: _headers,

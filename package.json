@@ -134,6 +134,7 @@
   },
   "dependencies": {
     "@types/axios": "^0.14.0",
-    "axios": "^1.6.8"
+    "axios": "^1.6.8",
+    "cmf-lbos": "file:C:/Users/Administrator/source/repos/BorgWarner-Suzhou/Libs/LBOs/TypeScript"
   }
 }
