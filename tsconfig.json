@@ -3,6 +3,9 @@
 		"module": "Node16",
 		"target": "ES2022",
 		"outDir": "out",
+		"paths": {
+		  "framework": ["src/framework"]
+		},
 		"lib": [
 			"ES2022"
 		],

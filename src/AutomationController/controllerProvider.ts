@@ -17,21 +17,82 @@ export class ControllerProvider implements vscode.TreeDataProvider<Controller> {
         }
 
         if (element) {
-            let iconPath = path.join(__filename, '..', '..', '../resources', 'workflow.svg');
-            let a = new Controller("controller1", "1111", "", "a1", vscode.TreeItemCollapsibleState.None, iconPath);
-            let b = new Controller("controller2", "1112", "", "b1", vscode.TreeItemCollapsibleState.None, iconPath);
-            let c = new Controller("controller2", "1113", "", "c1", vscode.TreeItemCollapsibleState.None, iconPath);
-            return Promise.resolve(
-                [a, b, c]
-            );
+            // console.log(JSON.stringify(element));
+            switch (element.type) {
+                case "controller": {
+                    // load controller versions
+                    return this.controllerManager.queryControllerVersionList(element.label).then((versionList) => {
+                        // console.log(JSON.stringify(versionList));
+                        let iconPath = path.join(__filename, '..', '..', '../resources', 'version.svg');
+                        let iconPath_Effectived = path.join(__filename, '..', '..', '../resources', 'version-effectived.svg');
+                        let list = [];
+                        for (let item of versionList) {
+                            let universalState = this.controllerManager.universalStateMap[item['UniversalState']];
+                            let label = `${item['Revision']}-${item['Version']} (${universalState})`;
+                            if (item['Id'] !== element.id) {
+                                let trueIconPath = universalState === "Effective" ? iconPath_Effectived : iconPath;
+                                list.push(new Controller(label, item['Id'], item['Description'], "", vscode.TreeItemCollapsibleState.Collapsed, "controllerversion", trueIconPath));
+                            }
+                        }
+                        vscode.window.showInformationMessage('Controller versions loaded!');
+                        return list;
+                    });
+                }
+                case "controllerversion": {
+                    // load workflows
+                    return this.controllerManager.loadAutomationControllerItems(element.id).then((controller) => {
+                        let iconPath = path.join(__filename, '..', '..', '../resources', 'workflow.svg');
+                        let workflows = controller.AutomationController.Workflows;
+
+                        let list = [];
+                        workflows.sort((a: any, b: any) => a.Order - b.Order);
+                        for (let item of workflows) {
+                            let universalState = this.controllerManager.universalStateMap[item['UniversalState']];
+                            let label = item['DisplayName'];
+                            // let trueIconPath=universalState === "Effective" ? iconPath_Effectived : iconPath;
+                            list.push(new Controller(label, `${item['Id']}-${element.id}`, universalState, "", vscode.TreeItemCollapsibleState.Collapsed, "workflow", iconPath, item));
+                        }
+                        vscode.window.showInformationMessage('Workflows loaded!');
+                        return list;
+                    });
+                }
+                case "workflow": {
+                    // load code tasks
+                    let tasks = JSON.parse(element.body.Workflow).tasks;
+
+                    let iconPath = path.join(__filename, '..', '..', '../resources', 'code.svg');
+                    let list = [];
+                    // tasks.sort((a: any, b: any) => a.Order - b.Order);
+                    for (let item of tasks) {
+                        if (item["reference"]["name"] === "codeExecution") {
+                            let label = item["settings"]["___cmf___description"];
+                            let id = `${item['id']}-${element.body['Id']}`;
+                            // let tsCode = Buffer.from(item["settings"]["jsCodeBase64"], 'base64').toString('utf8');
+                            let tsCode=item["settings"]["tsCode"];
+                            // let universalState = this.controllerManager.universalStateMap[item['UniversalState']];
+                            // let label = item['DisplayName'];
+                            // let trueIconPath=universalState === "Effective" ? iconPath_Effectived : iconPath;
+                            list.push(new Controller(label, id, item['driver'], "", vscode.TreeItemCollapsibleState.None, "codetask", iconPath, tsCode, `${label}-${id}.ts`));
+                        }
+                    }
+                    vscode.window.showInformationMessage('Code tasks loaded!');
+                    return Promise.resolve(list);
+                }
+                // case "codetask": {
+                //     // load taskcode content to a new text editor
+                //     break;
+                // }
+            }
+            return Promise.resolve([]);
         } else {
+            // load controllers
             return this.controllerManager.queryControllerList("AOI").then((controllerList) => {
-                console.log(JSON.stringify(controllerList));
+                // console.log(JSON.stringify(controllerList));
                 let list = [];
                 for (let item of controllerList) {
-                    list.push(new Controller(item['Name'], item['Id'], "", item['Revision'], vscode.TreeItemCollapsibleState.Collapsed));
+                    list.push(new Controller(item['Name'], item['Id'], item['Description'], item['Revision'], vscode.TreeItemCollapsibleState.Collapsed, "controller"));
                 }
-                // vscode.window.showInformationMessage('No automation controller loaded1');
+                vscode.window.showInformationMessage('Controller list loaded!');
                 return list;
             });
         }
@@ -53,13 +114,24 @@ class Controller extends vscode.TreeItem {
         public description: string,
         private version: string,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        _iconPath?: string
+        public type: string,
+        _iconPath?: string,
+        public body?: any,
+        public readonly filePath?: string,
     ) {
         super(label, collapsibleState);
-        this.tooltip = `${this.label}-${this.version}`;
+        this.tooltip = `${this.label} ${this.version}`;
         this.id = id;
-        this.description = `${this.version}-${this.description}`;
+        this.description = this.description ? `${this.version}-${this.description}` : this.version;
         this.iconPath = _iconPath ? _iconPath : path.join(__filename, '..', '..', '..', 'resources', 'controller.svg');
+        if (filePath) {
+            this.command = {
+                command: 'automationcontrollerlist.customOpenFile',
+                title: 'Open File',
+                arguments: [body, filePath],
+            };
+        }
+        // this.type=type;
     }
 
     // iconPath = {

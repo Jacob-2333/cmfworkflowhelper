@@ -11,6 +11,10 @@
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
+  "exports": {
+    ".": "./",
+    "./framework": "./out/framework.js"
+  },
   "contributes": {
     "viewsWelcome": [
       {
