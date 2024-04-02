@@ -9,6 +9,7 @@ import { Framework } from './framework';
 import { ControllerManager } from './AutomationController/controllerManager';
 import { ControllerProvider } from './AutomationController/controllerProvider';
 import * as ts from 'typescript';
+import 'reflect-metadata';
 
 const framework = new Framework();
 let controllerManager: ControllerManager;
@@ -81,7 +82,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
-	framework.system.initialize().then(() => {
+	framework.system.initialize(context).then(() => {
 		controllerManager = new ControllerManager(framework);
 		// const input = new framework.LBOS.Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByNameInput();
 		// input.Name = "_ARRAY1702993198_30184";

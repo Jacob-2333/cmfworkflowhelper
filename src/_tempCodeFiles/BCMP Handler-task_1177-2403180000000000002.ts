@@ -1,4 +1,4 @@
-import { Framework } from './framework';
+import { Framework } from 'framework';
 
 export default class {
 
@@ -186,7 +186,6 @@ export default class {
             await this.acceptMaterialDefects(unitMaterails);
 
             if (defects.length > 0) {
-                // FAIL
                 //record defects & store all units' history
                 await this.recordDefects(unitMaterails, defects, isPositiveSequence, resourceName, recordData, this.failFlag);
                 // trackout from AOI step -> trackin to review step
@@ -194,7 +193,6 @@ export default class {
                 await this.trackInWithoutResourceInfo(arrayName);
             }
             else {
-                // PASS
                 // store all units' history
                 let materialNames = [];
                 for (let unit of unitMaterails) {
@@ -280,7 +278,6 @@ export default class {
                     }
                     else {
                         // Main-lot
-                        // do nothing
                     }
 
                     // change CustomProcessedQuantity
@@ -289,43 +286,24 @@ export default class {
                     let newProcessedQuantity = processedQuantity + unitMaterial.ParentMaterial.SubMaterialCount;
                     await this.changeAttribute(productionOrder.Name, "ProductionOrder", "CustomProcessedQuantity", newProcessedQuantity);
 
-                    // Move to Buffer
-                    let xraySamplingRule = await this.getXraySamplingRules("CustomXraySamplingRules", unitMaterial.Product.Name);
-                    if (xraySamplingRule != undefined && xraySamplingRule != null) {
-                        let smaplingQuantity = Number(xraySamplingRule["Quantity"]);
-                        let smaplingPercent = Number(xraySamplingRule["Percent"]);
-                        if ((smaplingQuantity && smaplingQuantity > 0) || (smaplingPercent && smaplingPercent > 0)) {
-                            let inspectionFinished = await this.loadObjectAttribute(productionOrder, "CustomXrayInspectionFinished");
-                            if (inspectionFinished && inspectionFinished == true) {
-                                let sampingPercentQty = Math.ceil(smaplingPercent * productionOrder.Quantity / 100);
-                                let sampledQty = Number(await this.loadObjectAttribute(productionOrder, "CustomXrayPassedQuantity"));
-                                if ((sampledQty >= smaplingQuantity && sampledQty >= sampingPercentQty)) {
-                                    // X-ray inspection finished, can do partial track out
-                                    await this.partialTrackOut(unitMaterial.ParentMaterial.Name, false);
-                                } else {
-                                    // CustomXrayPassedQuantity does not arrive the quantitys configed in the rule
-                                    this.framework.logger.warning(`Current array need to wait X-ray inspection, XrayPassedQuantity: ${sampledQty}, Rule-Qty: ${smaplingQuantity}, Rule-PercentQty: ${sampingPercentQty}`);
-                                }
-                            }
-                            else {
-                                // CustomXrayInspectionFinished==false
-                                this.framework.logger.warning(`Current array need to wait X-ray inspection, CustomXrayInspectionFinished == false`);
-                            }
-                        } else {
-                            // Rules check failed
-                            this.framework.logger.error(`X-ray sampling rule does not config correctly, Quantity: ${xraySamplingRule["Quantity"]}, Percent: ${xraySamplingRule["Percent"]}`)
-                        }
-                    } else {
-                        // Rules don't exit, can do partial track out
-                        await this.partialTrackOut(unitMaterial.ParentMaterial.Name, false);
-                    }
-
                     if (newProcessedQuantity == (productionOrder.Quantity - newAOIReworkQuantity)) {
-                        // 20240327
-                        // do nothing
+                        // 20240312 TODO
+                        // xray sampling finished quantity validation
                     }
                 }
             }
+
+            // 20240303 TODO
+            // for (let unit of unitMaterails) {
+            //     this.outputs.material.emit({ Name: unit.Name });
+            //     this.outputs.resource.emit({ Name: resourceName });
+            //     if (status = this.passFlag) {
+            //         this.outputs.passFail.emit("Pass");
+            //     } else {
+            //         this.outputs.passFail.emit("Fail");
+            //     }
+            //     await this.framework.utils.sleep(20);
+            // }
 
             await this.reply(id, true);
         }
@@ -390,7 +368,7 @@ export default class {
             trackininput.Resource = resource;
 
             let trackinoutput = await this.customSystemCall(this.framework, trackininput);
-            this.framework.logger.warning(`====== array: ${materialName}, step: ${material.Step.Name}, trackinoutput: ${trackinoutput.Message}`);
+            this.framework.logger.warning(`====== array: ${materialName}, trackinoutput: ${trackinoutput.Message}`);
         }
     }
 
@@ -778,7 +756,7 @@ export default class {
         input.Material.set(material, new this.framework.LBOS.Cmf.Navigo.BusinessObjects.ComplexTrackOutParameters);
 
         const trackoutput = await this.customSystemCall(this.framework, input);
-        this.framework.logger.warning(`------ array: ${materialName}, step: ${material.Step.Name}, trackoutOutput: ${trackoutput.Message}`);
+        this.framework.logger.warning(`------ array: ${materialName}, trackoutOutput: ${trackoutput.Message}`);
         for (let key of trackoutput.Materials.keys()) {
             return key;
         }
@@ -1087,44 +1065,6 @@ export default class {
         else {
             this.framework.logger.info("No matching data to collect.");
             return { materialObject: material, errorMessage: "" };
-        }
-    }
-
-    public async getXraySamplingRules(tableName: string, productName: string): Promise<any> {
-        let input = new this.framework.LBOS.Cmf.Foundation.BusinessOrchestration.TableManagement.InputObjects.LoadSmartTableRowsWithoutChangesInput();
-        input.SmartTable = await this.getSmartTableByName(tableName);
-        input.Filters = new this.framework.LBOS.Cmf.Foundation.BusinessObjects.QueryObject.FilterCollection();
-
-        let filter0 = new this.framework.LBOS.Cmf.Foundation.BusinessObjects.QueryObject.Filter();
-        filter0.LogicalOperator = 1;
-        filter0.Name = "Product";
-        filter0.ObjectName = "Product";
-        filter0.Operator = 0;
-        filter0.Value = productName;
-
-        input.Filters.push(filter0);
-        input.SortingObjectCollection = [];
-
-        let output = await this.framework.system.call(input);
-        let smartTable = output.SmartTable;
-        let dataTable = smartTable.Data[`T_ST_${tableName}`];
-        for (let row of dataTable) {
-            this.framework.logger.warning(`Quantity: ${row["Quantity"]}, Percent: ${row["Percent"]}`);
-            return row;
-        }
-        return undefined;
-    }
-
-    public async getSmartTableByName(tableName: string): Promise<any> {
-        let input = new this.framework.LBOS.Cmf.Foundation.BusinessOrchestration.TableManagement.InputObjects.GetSmartTableByNameInput();
-        input.SmartTableName = tableName;
-        input.LoadData = false;
-        let output = await this.framework.system.call(input);
-        if (output) {
-            return output.SmartTable;
-        }
-        else {
-            return undefined;
         }
     }
 }

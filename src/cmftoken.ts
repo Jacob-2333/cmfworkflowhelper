@@ -13,6 +13,7 @@ import axios, { AxiosResponse } from 'axios';
 // }
 
 export class CmfToken {
+
     _requestDefaultHeaders: any = {
         Cmf_ReturnFaultExceptions: false,
         Cmf_CurrentCulture: "en-US",
@@ -38,7 +39,7 @@ export class CmfToken {
             client_id: "MES",
             refresh_token: refresh_token
         });
-        return res.access_token;
+        return res;
     }
 
     public async getApplicationBootInformation(access_token: string) {
