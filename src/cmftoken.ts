@@ -114,27 +114,6 @@ export class CmfToken {
         }
     }
 
-    // public async test() {
-    //     const getDataResult = await this.sendGetRequest();
-    //     console.log('GET Response:', getDataResult);
-
-    //     const postData: IData = { id: 1, name: 'Example Data' };
-    //     const postDataResult = await this.sendPostRequest(postData);
-    //     console.log('POST Response:', postDataResult);
-    // }
-
-
-    // _requestDefaultHeaders = {
-    //     Cmf_ReturnFaultExceptions: false,
-    //     Cmf_CurrentCulture: "en-US",
-    //     Cmf_RequestedTimeZone: "",
-    //     Cmf_ClientTenantName: "BorgWarnerSuzhou",
-    //     Cmf_HostName: "ConnectIoT",
-    //     Cmf_SessionId: Math.random() * (1000000000000 - 1) + 1,
-    //     Cmf_SignatureToken: 555984152,
-    //     Cmf_RequestedUserName: null,
-    //     "Content-Type": "application/json; charset=UTF-8"
-    // };
 
     // authenticateBySecurityPortal(config:any) {
     //     // return 
@@ -193,15 +172,5 @@ export class CmfToken {
     //         }
     //         catch (responseError) {
     //         }
-    // }
-
-    // restClient(method:any, url:any) {
-    //     let request = (0, superagent_1.default)(method, url);
-    //     // This is required in superagent >= 5.1.2
-    //     if (process.env["NODE_TLS_REJECT_UNAUTHORIZED"] === "0" &&
-    //         typeof request["disableTLSCerts"] === "function") {
-    //         request.disableTLSCerts();
-    //     }
-    //     return (request);
     // }
 }

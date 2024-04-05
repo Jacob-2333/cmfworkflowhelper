@@ -1,4 +1,4 @@
-import { Framework } from 'src/localFramework';
+import { Framework } from 'framework';
 
 export default class {
 
@@ -23,7 +23,7 @@ export default class {
             // 1. Remove '\r\n'       
             mInput = mInput.replace(/\n/gm, "");
             mInput = mInput.replace(/\r/gm, "");
-            this.framework.logger.warning("DataReceived:=" + mInput);
+            this.framework.logger.info("DataReceived:=" + mInput);
             const pairs: string[] = mInput.split('|');
             const varList: VariableType[] = [];
             outObj = { uid: Date.now(), entity: "", name: pairs[0].toUpperCase().trim(), variables: varList };

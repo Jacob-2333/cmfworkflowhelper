@@ -1,4 +1,4 @@
-import { Framework } from 'framework';
+import { Framework } from 'src/localFramework';
 
 export default class {
 

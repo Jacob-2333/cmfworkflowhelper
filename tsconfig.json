@@ -5,7 +5,7 @@
 		"outDir": "out",
 		"baseUrl": ".",
 		"paths": {
-		  "framework": ["src/framework"]
+		  "framework": ["src/_d_ts/framework"]
 		},
 		"lib": [
 			"ES2022"

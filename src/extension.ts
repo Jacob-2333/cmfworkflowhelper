@@ -5,13 +5,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { NodeDependenciesProvider } from './NodeDependenciesProvider';
 import { CmfToken } from './cmftoken';
-import { Framework } from './framework';
+import { LocalFramework } from './localFramework';
 import { ControllerManager } from './AutomationController/controllerManager';
 import { ControllerProvider } from './AutomationController/controllerProvider';
 import * as ts from 'typescript';
-import 'reflect-metadata';
+// import 'reflect-metadata';
 
-const framework = new Framework();
+const localFramework = new LocalFramework();
 let controllerManager: ControllerManager;
 
 // This method is called when your extension is activated
@@ -20,11 +20,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 	const nodeDependenciesProvider = new NodeDependenciesProvider("F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper");
 	// const nodeDependenciesProvider = new NodeDependenciesProvider("E:\\VS2024\\Vscode\\cmfworkflowhelper");
-	vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
+	const treeView = vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
 	let disposable1 = vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => {
 		nodeDependenciesProvider.refresh();
 		console.log("my refresh");
 	});
+
 
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
@@ -42,13 +43,14 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('config your token!');
 	});
 
-	let disposable4 = vscode.commands.registerCommand('automationcontrollerlist.customOpenFile', async (body, filePath) => {
-		let fileFullPath = path.join(__filename, '..', '..', 'src','_tempCodeFiles', filePath);
+	let disposable4 = vscode.commands.registerCommand('automationcontrollerlist.customOpenFile', async (body, filePath, _self) => {
+		let fileFullPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles', filePath);
+		// _self.contextValue="codetask_selected";
 		console.log(fileFullPath);
 		vscode.window.showInformationMessage(`${fileFullPath}`);
 		// let filePath = vscode.Uri.joinPath(vscode.Uri.file('F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper\\resources\\test2.json'));
 		try {
-			let tsCode=fromMultilineArray(body);
+			let tsCode = fromMultilineArray(body);
 			// const compiledJsCode = compileTsToJs(tsCode);
 			// console.log('Compiled JavaScript:', compiledJsCode);
 			await fs.promises.writeFile(fileFullPath, tsCode);
@@ -70,10 +72,27 @@ export function activate(context: vscode.ExtensionContext) {
 		// });
 	});
 
+	let disposable5 = vscode.commands.registerCommand('automationcontrollerlist.saveEntry', (treeView) => {
+		vscode.window.showInformationMessage('automationcontrollerlist.saveEntry');
+		console.log(treeView.filePath);
+		let fileFullPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles', treeView.filePath);
+		let editors = vscode.window.visibleTextEditors;
+		// console.log(editors);
+		editors.forEach(editor => {
+			console.log(editor.document.fileName);
+			if(fileFullPath===editor.document.fileName){
+				editor.document.save();
+				console.log("====------=====");
+				// Todo: 将代码重新转换为JavaScript，然后保存到json文本中，再上传至controller。
+			}
+		});
+	});
+
 	context.subscriptions.push(disposable1);
 	context.subscriptions.push(disposable2);
 	context.subscriptions.push(disposable3);
 	context.subscriptions.push(disposable4);
+	context.subscriptions.push(disposable5);
 
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -82,8 +101,8 @@ export function activate(context: vscode.ExtensionContext) {
 
 
 
-	framework.system.initialize(context).then(() => {
-		controllerManager = new ControllerManager(framework);
+	localFramework.system.initialize(context).then(() => {
+		controllerManager = new ControllerManager(localFramework);
 		// const input = new framework.LBOS.Cmf.Foundation.BusinessOrchestration.GenericServiceManagement.InputObjects.GetObjectByNameInput();
 		// input.Name = "_ARRAY1702993198_30184";
 		// input.LevelsToLoad = 0;
@@ -110,19 +129,19 @@ export function activate(context: vscode.ExtensionContext) {
 		// 返回编译后的JavaScript代码
 		return output.outputText;
 	}
-	
-    /**
-     * Converts a string with multiple lines to an array of strings where each entry represents a line.
-     * Also replaces tabs with spaces.
-     * Useful for readability when saving to json.
-     */
-    function toMultilineArray(value: any) {
-        return value?.replace(/\t/g, '    ').split('\n') || [];
-    }
-    /** Converts an array of strings to a single string with line breaks */
-    function fromMultilineArray(value: any) {
-        return value?.join('\n') || '';
-    }
+
+	/**
+	 * Converts a string with multiple lines to an array of strings where each entry represents a line.
+	 * Also replaces tabs with spaces.
+	 * Useful for readability when saving to json.
+	 */
+	function toMultilineArray(value: any) {
+		return value?.replace(/\t/g, '    ').split('\n') || [];
+	}
+	/** Converts an array of strings to a single string with line breaks */
+	function fromMultilineArray(value: any) {
+		return value?.join('\n') || '';
+	}
 }
 
 

@@ -18,7 +18,7 @@ export class ControllerProvider implements vscode.TreeDataProvider<Controller> {
 
         if (element) {
             // console.log(JSON.stringify(element));
-            switch (element.type) {
+            switch (element.contextValue) {
                 case "controller": {
                     // load controller versions
                     return this.controllerManager.queryControllerVersionList(element.label).then((versionList) => {
@@ -114,7 +114,7 @@ class Controller extends vscode.TreeItem {
         public description: string,
         private version: string,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState,
-        public type: string,
+        public contextValue: string,
         _iconPath?: string,
         public body?: any,
         public readonly filePath?: string,
@@ -128,9 +128,10 @@ class Controller extends vscode.TreeItem {
             this.command = {
                 command: 'automationcontrollerlist.customOpenFile',
                 title: 'Open File',
-                arguments: [body, filePath],
+                arguments: [body, filePath,this],
             };
         }
+        // this.contextValue=contextValue;
         // this.type=type;
     }
 

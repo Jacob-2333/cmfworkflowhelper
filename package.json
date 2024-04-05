@@ -13,7 +13,7 @@
   "main": "./out/extension.js",
   "exports": {
     ".": "./",
-    "./framework": "./out/framework.js"
+    "./localframework": "./out/localFramework.js"
   },
   "contributes": {
     "viewsWelcome": [
@@ -72,6 +72,11 @@
       {
         "command": "automationcontrollerlist.configToken",
         "title": "ConfigToken"
+      },
+      {
+        "command": "automationcontrollerlist.saveEntry",
+        "title": "Save",
+        "icon": "resources/save.svg"
       }
     ],
     "views": {
@@ -113,6 +118,11 @@
         {
           "command": "nodeDependencies.deleteEntry",
           "when": "view == nodeDependencies"
+        },
+        {
+          "command": "automationcontrollerlist.saveEntry",
+          "when": "view == automationcontrollerlist && viewItem == codetask",
+          "group": "inline"
         }
       ]
     }
@@ -137,10 +147,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@criticalmanufacturing/connect-iot-controller-engine": "^9.1.13-202403271",
     "@types/axios": "^0.14.0",
     "axios": "^1.6.8",
-    "cmf-lbos": "file:C:/Users/Administrator/source/repos/BorgWarner-Suzhou/Libs/LBOs/TypeScript",
-    "reflect-metadata": "^0.2.2"
+    "cmf-lbos": "file:C:/Users/Administrator/source/repos/BorgWarner-Suzhou/Libs/LBOs/TypeScript"
   }
 }

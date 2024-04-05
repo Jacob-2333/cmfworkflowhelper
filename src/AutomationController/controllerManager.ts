@@ -1,11 +1,11 @@
-import { Framework } from "framework";
+import { LocalFramework } from "src/localFramework";
 
 
 export class ControllerManager {
-    private framework: Framework;
+    private framework: LocalFramework;
     public universalStateMap:any={};
 
-    constructor(framework: Framework) {
+    constructor(framework: LocalFramework) {
         this.framework = framework;
 
 
@@ -14,6 +14,7 @@ export class ControllerManager {
         //     Green = 'green',
         //     Blue = 'blue'
         //   }
+        // this.framework.funa();
 
         // 创建一个映射表
         Object.keys(framework.LBOS.Cmf.Foundation.Common.Base.UniversalState).forEach(key => {
