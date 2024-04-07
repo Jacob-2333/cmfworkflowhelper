@@ -146,6 +146,13 @@ class Controller extends vscode.TreeItem {
                 arguments: [body, id, filePath, this],
             };
         }
+        // if(contextValue==="controllerversion"){
+        //     this.command = {
+        //         command: 'automationcontrollerlist.downloadEntry',
+        //         title: 'Download Workflows',
+        //         arguments: [id],
+        //     };
+        // }
         // this.contextValue=contextValue;
         // this.type=type;
     }

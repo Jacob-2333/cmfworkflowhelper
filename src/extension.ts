@@ -112,7 +112,7 @@ export function activate(context: vscode.ExtensionContext) {
 			prompt: `Input your Access Token`,
 		});
 		if (tokenInput !== undefined) {
-			if(tokenInput.length > 0){
+			if (tokenInput.length > 0) {
 				cmf_access_token.access_token = tokenInput;
 				console.log(JSON.stringify(cmf_access_token));
 				// 写入数据
@@ -145,6 +145,7 @@ export function activate(context: vscode.ExtensionContext) {
 			return;
 		}
 	});
+
 	let disposable3 = vscode.commands.registerCommand('automationcontrollerlist.loadControllerList', () => { refreshControllerList(true); });
 
 	let disposable4 = vscode.commands.registerCommand('automationcontrollerlist.customOpenFile', async (body, id, filePath, _self) => {
@@ -273,6 +274,40 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable6 = vscode.commands.registerCommand('automationcontrollerlist.refreshEntry', () => { refreshControllerList(false); });
 	let disposable7 = vscode.commands.registerCommand('automationcontrollerlist.searchEntry', () => { refreshControllerList(true); });
 
+	let disposable8 = vscode.commands.registerCommand('automationcontrollerlist.downloadEntry', async (treeView) => {
+		const options: vscode.OpenDialogOptions = {
+			canSelectFiles: false, // 是否可以选择文件，默认为false
+			canSelectFolders: true, // 是否可以选择文件夹，默认为false
+			canSelectMany: false, // 是否可以选择多个项目，默认为false
+			// defaultUri: vscode.Uri.file('/default/path'), // 可选，默认打开的路径
+			openLabel: 'Select', // 可选，自定义确认按钮文本
+			// filters: { // 可选，指定文件过滤器
+			//   'Text Files': ['txt', 'md'],
+			//   'Image Files': ['jpg', 'png', 'gif']
+			// },
+		};
+		let filePathUrls: any = await vscode.window.showOpenDialog(options);
+		console.log(filePathUrls);
+		if (filePathUrls && filePathUrls.length > 0) {
+			// 用户选择了至少一个文件或文件夹
+			// for (const uri of filePathUrls) {
+			//   console.log(uri.fsPath); // 打印出所选文件或文件夹的本地文件系统路径
+			//   // 在这里处理用户选择的资源
+			// }
+			let controller = await controllerManager.loadAutomationControllerItems(treeView.id);
+			let workflows = controller.AutomationController.Workflows;
+
+			for (let item of workflows) {
+				let label = item['DisplayName'];
+				let fileFullPath = path.join(filePathUrls[0].fsPath, `${label}.json`);
+				await fs.promises.writeFile(fileFullPath, item.Workflow);
+			}
+			vscode.window.showInformationMessage("All workflows download successfully!");
+		} else {
+			// 用户取消了对话框，没有选择任何资源
+			console.log('User cancelled the dialog');
+		}
+	});
 
 
 	context.subscriptions.push(disposable1);
@@ -282,7 +317,7 @@ export function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(disposable5);
 	context.subscriptions.push(disposable6);
 	context.subscriptions.push(disposable7);
-	// context.subscriptions.push(disposable9);
+	context.subscriptions.push(disposable8);
 
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)

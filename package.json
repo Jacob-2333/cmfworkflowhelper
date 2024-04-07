@@ -69,6 +69,11 @@
         "command": "automationcontrollerlist.hostEntry",
         "title": "Host",
         "icon": "resources/domain.svg"
+      },
+      {
+        "command": "automationcontrollerlist.downloadEntry",
+        "title": "Download Workflows",
+        "icon": "resources/download.svg"
       }
     ],
     "views": {
@@ -109,6 +114,11 @@
           "command": "automationcontrollerlist.saveEntry",
           "when": "view == automationcontrollerlist && viewItem == codetask",
           "group": "inline"
+        },
+        {
+          "command": "automationcontrollerlist.downloadEntry",
+          "when": "view == automationcontrollerlist && viewItem == controllerversion",
+          "group": "inline"
         }
       ]
     }
@@ -135,6 +145,6 @@
   "dependencies": {
     "@types/axios": "^0.14.0",
     "axios": "^1.6.8",
-    "cmf-lbos": "file:C:/Users/Administrator/source/repos/BorgWarner-Suzhou/Libs/LBOs/TypeScript"
+    "cmf-lbos": "file:./src/cmf-lbos"
   }
 }

@@ -5,7 +5,8 @@
 		"outDir": "out",
 		"baseUrl": ".",
 		"paths": {
-		  "framework": ["src/_types/framework"]
+		  "framework": ["src/_types/framework"],
+		//   "cmf-lbos": ["src/_types/cmf.lbos"]
 		},
 		"lib": [
 			"ES2022"

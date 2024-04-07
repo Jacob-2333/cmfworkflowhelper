@@ -44,7 +44,7 @@ export class System {
             // console.log(token_endpoint);
             // this.cmf_access_token = await this.cmfToken.getAccessToken(token_endpoint, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbGllbnRJZCI6Ik1FUyIsInRlbmFudE5hbWUiOiJCb3JnV2FybmVyU3V6aG91Iiwic3ViIjoiR0xPQkFMXFxCUkNBSSIsInNjb3BlIjpudWxsLCJleHRyYVZhbHVlcyI6bnVsbCwidHlwZSI6IlBBVCIsImlhdCI6MTcxMDMwNjI4MiwiZXhwIjoyMTQ1NTQyMzk5LCJhdWQiOiJBdXRoUG9ydGFsIiwiaXNzIjoiQXV0aFBvcnRhbCJ9.p6v5LWgoCMF5fpN6GG7rX4icsIxzQ8o4wHL3wxXq4bU");
             this.cmf_access_token = {
-                host: "http://localhost:8083",//http://suzvsmesapp21.global.borgwarner.net
+                host: "",//http://suzvsmesapp21.global.borgwarner.net//http://localhost:8083
                 expires_in: 36000,
                 access_token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJDTUZcXGNjYWkiLCJ0ZW5hbnROYW1lIjoiQm9yZ1dhcm5lclN1emhvdSIsIm5iZiI6MTcxMjE5NzA1OCwiZXhwIjoxNzEzNDA2NjU4LCJpc3MiOiJDTUZIb3N0IiwiYXVkIjoiTUVTIn0.A9COsruRtqJNuphmA5mavA1yeE3-9k5mfojYGyp8pGE",
                 timestamp: currTimestamp
