@@ -3,7 +3,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { NodeDependenciesProvider } from './NodeDependenciesProvider';
 import { CmfToken } from './cmftoken';
 import { LocalFramework } from './localFramework';
 import { ControllerManager } from './AutomationController/controllerManager';
@@ -18,44 +17,163 @@ let controllerManager: ControllerManager;
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-	const nodeDependenciesProvider = new NodeDependenciesProvider("F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper");
-	// const nodeDependenciesProvider = new NodeDependenciesProvider("E:\\VS2024\\Vscode\\cmfworkflowhelper");
-	const treeView = vscode.window.registerTreeDataProvider('nodeDependencies', nodeDependenciesProvider);
-	let disposable1 = vscode.commands.registerCommand('nodeDependencies.refreshEntry', () => {
-		nodeDependenciesProvider.refresh();
-		console.log("my refresh");
-	});
-
-
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable2 = vscode.commands.registerCommand('automationcontrollerlist.loadControllerList', async () => {
+	let searchInputContext: any = "";
+	let controllerManagerProvider: ControllerProvider;
+	async function refreshControllerList(search: boolean) {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('In this function, we will load controllers');
-
-		const controllerManagerProvider = new ControllerProvider(controllerManager);
+		if (search) {
+			searchInputContext = await vscode.window.showInputBox({
+				placeHolder: 'Leave it empty if you want to load all...',
+				prompt: `Key words for searching 'AutomationController'`,
+			});
+			if (searchInputContext !== undefined) {
+				console.log(`Key words for searching 'AutomationController': ${searchInputContext}`);
+			} else {
+				searchInputContext = "";
+			}
+		}
+		controllerManagerProvider = new ControllerProvider(controllerManager, searchInputContext);
 		vscode.window.registerTreeDataProvider('automationcontrollerlist', controllerManagerProvider);
+		// vscode.window.showInformationMessage('In this function, we will load controllers');
+
+		// 获取所有已打开的编辑器
+		let editorsCount = vscode.window.visibleTextEditors.length;
+		while (editorsCount > 0) {
+			// 关闭编辑器对应的文档，这会关闭所有打开此文档的编辑器窗口
+			await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+			// 可选：等待一段时间以确保编辑器关闭后再关闭下一个
+			await new Promise(resolve => setTimeout(resolve, 20)); // 延迟100毫秒
+			editorsCount = vscode.window.visibleTextEditors.length;
+			if (editorsCount > 0) {
+				// 切换到上一个编辑器
+				await vscode.commands.executeCommand('workbench.action.previousEditor');
+				await new Promise(resolve => setTimeout(resolve, 20)); // 延迟100毫秒
+				await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+				await new Promise(resolve => setTimeout(resolve, 20)); // 延迟100毫秒
+				let newEditorsCount = vscode.window.visibleTextEditors.length;
+				if (editorsCount === newEditorsCount) {
+					// 切换到下一个编辑器
+					await vscode.commands.executeCommand('workbench.action.nextEditor');
+					await new Promise(resolve => setTimeout(resolve, 20)); // 延迟100毫秒
+					await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+					await new Promise(resolve => setTimeout(resolve, 20)); // 延迟100毫秒
+				}
+				editorsCount = vscode.window.visibleTextEditors.length;
+			}
+		}
+
+		// 删除_tempCodeFiles文件夹下所有缓存的文件
+		// 防止误删上级目录
+		let dirPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles');
+		// if (!dirPath.startsWith(process.cwd())) {
+		vscode.window.showInformationMessage(`Clear directory path: ${dirPath}`);
+		// throw new Error("Invalid directory path");
+		// }
+
+		try {
+			const entries = await fs.promises.readdir(dirPath, { withFileTypes: true });
+
+			for (const entry of entries) {
+				const fullPath = path.join(dirPath, entry.name);
+
+				if (!entry.isDirectory()) {
+					// 删除文件
+					await fs.promises.unlink(fullPath);
+				}
+			}
+		} catch (err) {
+			// 处理错误，例如权限不足或其他异常情况
+			vscode.window.showErrorMessage(`Failed to delete files in "${dirPath}"`);
+			vscode.window.showErrorMessage(`${err}`);
+		}
+
+		// // 遍历并依次关闭每个编辑器
+		// for (const editor of editors) {
+		// 	// 关闭编辑器对应的文档，这会关闭所有打开此文档的编辑器窗口
+		// 	await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+		// 	// 切换到下一个编辑器
+		// 	await vscode.commands.executeCommand('workbench.action.closeActiveEditor');
+
+		// }
+
+		// 可选：打开一个新的空文档以确保至少有一个活动编辑器
+		// await vscode.commands.executeCommand('workbench.action.newUntitledFile');
+	}
+
+	let disposable1 = vscode.commands.registerCommand('automationcontrollerlist.tokenEntry', async () => {
+		let cmf_access_token: any = context.globalState.get('cmf_access_token');
+
+		let tokenInput = await vscode.window.showInputBox({
+			placeHolder: cmf_access_token && cmf_access_token.access_token ? cmf_access_token.access_token : 'Your access token...',
+			prompt: `Input your Access Token`,
+		});
+		if (tokenInput !== undefined) {
+			if(tokenInput.length > 0){
+				cmf_access_token.access_token = tokenInput;
+				console.log(JSON.stringify(cmf_access_token));
+				// 写入数据
+				context.globalState.update('cmf_access_token', cmf_access_token);
+				// console.log(`Key words for searching 'AutomationController': ${searchInputContext}`);
+			}
+		} else {
+			vscode.window.showErrorMessage("Access Token is empty!");
+			return;
+		}
 	});
 
-	let disposable3 = vscode.commands.registerCommand('automationcontrollerlist.configToken', () => {
-		vscode.window.showInformationMessage('config your token!');
-	});
+	let disposable2 = vscode.commands.registerCommand('automationcontrollerlist.hostEntry', async () => {
+		let cmf_access_token: any = context.globalState.get('cmf_access_token');
 
-	let disposable4 = vscode.commands.registerCommand('automationcontrollerlist.customOpenFile', async (body, filePath, _self) => {
+		let hostInput = await vscode.window.showInputBox({
+			placeHolder: cmf_access_token && cmf_access_token.host ? cmf_access_token.host : 'Host of MES...',
+			prompt: `Input the host of MES`,
+		});
+		if (hostInput !== undefined) {
+			if (hostInput.length > 0) {
+				cmf_access_token.host = hostInput;
+				console.log(JSON.stringify(cmf_access_token));
+				// 写入数据
+				context.globalState.update('cmf_access_token', cmf_access_token);
+				// console.log(`Key words for searching 'AutomationController': ${searchInputContext}`);
+			}
+		} else {
+			vscode.window.showErrorMessage("Host is empty!");
+			return;
+		}
+	});
+	let disposable3 = vscode.commands.registerCommand('automationcontrollerlist.loadControllerList', () => { refreshControllerList(true); });
+
+	let disposable4 = vscode.commands.registerCommand('automationcontrollerlist.customOpenFile', async (body, id, filePath, _self) => {
 		let fileFullPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles', filePath);
 		// _self.contextValue="codetask_selected";
 		console.log(fileFullPath);
-		vscode.window.showInformationMessage(`${fileFullPath}`);
+		// vscode.window.showInformationMessage(`${fileFullPath}`);
 		// let filePath = vscode.Uri.joinPath(vscode.Uri.file('F:\\VS2024\\MyVscodeExtension\\cmfworkflowhelper\\resources\\test2.json'));
 		try {
-			let tsCode = fromMultilineArray(body);
-			// const compiledJsCode = compileTsToJs(tsCode);
-			// console.log('Compiled JavaScript:', compiledJsCode);
-			await fs.promises.writeFile(fileFullPath, tsCode);
+			let ids = id.split('-');
+			let taskId = ids[0];
+			let workflowId = ids[1];
+			let controllerId = ids[2];
+			// load code tasks
+			for (let workflowItem of body.Workflows) {
+				if (workflowItem.Id === workflowId) {
+					let tasks = JSON.parse(workflowItem.Workflow).tasks;
+					for (let taskItem of tasks) {
+						if (taskItem['id'] === taskId) {
+							let tsCode = fromMultilineArray(taskItem["settings"]["tsCode"]);
+							// const compiledJsCode = compileTsToJs(tsCode);
+							// console.log('Compiled JavaScript:', compiledJsCode);
+							await fs.promises.writeFile(fileFullPath, tsCode);
 
-			console.log(`create file successed`);
+							console.log(`create file successed`);
+						}
+					}
+				}
+			}
 		} catch (error: any) {
 			vscode.window.showErrorMessage(`Failed to create file: ${error.message}`);
 			return;
@@ -72,27 +190,99 @@ export function activate(context: vscode.ExtensionContext) {
 		// });
 	});
 
-	let disposable5 = vscode.commands.registerCommand('automationcontrollerlist.saveEntry', (treeView) => {
-		vscode.window.showInformationMessage('automationcontrollerlist.saveEntry');
-		console.log(treeView.filePath);
+	let disposable5 = vscode.commands.registerCommand('automationcontrollerlist.saveEntry', async (treeView) => {
+		// vscode.window.showInformationMessage('automationcontrollerlist.saveEntry');
 		let fileFullPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles', treeView.filePath);
-		let editors = vscode.window.visibleTextEditors;
-		// console.log(editors);
-		editors.forEach(editor => {
-			console.log(editor.document.fileName);
-			if(fileFullPath===editor.document.fileName){
-				editor.document.save();
-				console.log("====------=====");
-				// Todo: 将代码重新转换为JavaScript，然后保存到json文本中，再上传至controller。
+
+		let activeTextEditor = vscode.window.activeTextEditor;
+		if (activeTextEditor) {
+			console.log(activeTextEditor.document.fileName);
+			if (fileFullPath === activeTextEditor.document.fileName) {
+
+				// 检查代码是否存在错误
+				const diagnostics = vscode.languages.getDiagnostics(activeTextEditor.document.uri);
+				let hasErrors = false;
+				diagnostics.forEach(diagnostic => {
+					if (diagnostic.severity === vscode.DiagnosticSeverity.Error) {
+						hasErrors = true;
+						// 可以进一步处理错误信息，例如：打印错误位置和消息
+						console.error(`Error at line ${diagnostic.range.start.line + 1}, column ${diagnostic.range.start.character}: ${diagnostic.message}`);
+					}
+				});
+
+				if (hasErrors) {
+					vscode.window.showErrorMessage('The current document contains errors.');
+				} else {
+					// vscode.window.showInformationMessage('The current document does not contain any error.');
+					// 保存
+					activeTextEditor.document.save();
+					console.info(treeView.filePath);
+					// 编译编辑器中的ts代码至js，并将workflow中code task的内容替换为编译后的js代码
+					let tsCode = activeTextEditor.document.getText();
+					let ids = treeView.id.split('-');
+					let taskId = ids[0];
+					let workflowId = ids[1];
+					let controllerId = ids[2];
+					let automationController = treeView.body;
+
+					// load code tasks
+					let changed = false;
+					for (let workflowItem of treeView.body.Workflows) {
+						if (workflowItem.Id === workflowId) {
+							let workflow = JSON.parse(workflowItem.Workflow);
+							for (let taskItem of workflow.tasks) {
+								if (taskItem['id'] === taskId) {
+									taskItem["settings"]["tsCode"] = toMultilineArray(tsCode);
+									const compiledJsCode = compileTsToJs(tsCode);
+									console.info(compiledJsCode);
+									let _jsCodeBase64 = Buffer.from(compiledJsCode, 'utf8').toString('base64');
+									if (taskItem["settings"]["jsCodeBase64"] !== _jsCodeBase64) {
+										taskItem["settings"]["jsCodeBase64"] = _jsCodeBase64;
+										workflowItem.Workflow = JSON.stringify(workflow);
+										changed = true;
+										break;
+									}
+								}
+							}
+							if (changed) {
+								break;
+							}
+						}
+					}
+
+					//上传到MES
+					try {
+						let output = await controllerManager.fullUpdateAutomationController(treeView.body);
+						treeView.body = output.AutomationController;
+						vscode.window.showInformationMessage("All workflows are updated!");
+					}
+					catch (ex: any) {
+						vscode.window.showErrorMessage(ex.response.data.Message);
+					}
+				}
 			}
-		});
+			else {
+				vscode.window.showErrorMessage('Current actived file is not match the code you will save!');
+			}
+		}
+		else {
+			vscode.window.showErrorMessage('Please open a new tsCode first!');
+		}
 	});
+
+	let disposable6 = vscode.commands.registerCommand('automationcontrollerlist.refreshEntry', () => { refreshControllerList(false); });
+	let disposable7 = vscode.commands.registerCommand('automationcontrollerlist.searchEntry', () => { refreshControllerList(true); });
+
+
 
 	context.subscriptions.push(disposable1);
 	context.subscriptions.push(disposable2);
 	context.subscriptions.push(disposable3);
 	context.subscriptions.push(disposable4);
 	context.subscriptions.push(disposable5);
+	context.subscriptions.push(disposable6);
+	context.subscriptions.push(disposable7);
+	// context.subscriptions.push(disposable9);
 
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)

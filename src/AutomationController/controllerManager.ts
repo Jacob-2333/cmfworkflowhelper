@@ -1,4 +1,6 @@
 import { LocalFramework } from "src/localFramework";
+// import * as fs from 'fs';
+// import * as path from 'path';
 
 
 export class ControllerManager {
@@ -34,9 +36,31 @@ export class ControllerManager {
             let output = await this.framework.system.call(input);
             return output;
         } catch (ex: any) {
-            console.log(ex.Message);
+            console.error(ex.Message);
             // this.framework.logger.error(ex.Message);
             return undefined;
+        }
+    }
+
+    public async fullUpdateAutomationController(automationController:any){
+        try{
+            let input=new this.framework.LBOS.Cmf.Foundation.BusinessOrchestration.ConnectIoTManagement.InputObjects.FullUpdateAutomationControllerInput();
+            input.AutomationController=automationController;
+            input.FullUpdateParameters=new this.framework.LBOS.Cmf.Foundation.BusinessObjects.AutomationControllerFullUpdateParameters();
+            input.FullUpdateParameters.WorkflowsToUpdate=new this.framework.LBOS.Cmf.Foundation.BusinessObjects.AutomationWorkflowCollection();
+            for(let workflow of automationController.Workflows){
+                let _wf:any={"$ref":workflow["$id"]};
+                input.FullUpdateParameters.WorkflowsToUpdate.push(_wf);
+            }
+            // input.FullUpdateParameters.WorkflowsToUpdate=automationController.Workflows;
+            // let fileFullPath = path.join(__filename, '..', '..', '..', 'src', '_others', "test5.json");
+            // await fs.promises.writeFile(fileFullPath, JSON.stringify(input));
+            let output = await this.framework.system.call(input);
+            return output;
+        }catch (ex:any) {
+            throw ex;
+            // this.framework.logger.error(ex.Message);
+            // return undefined;
         }
     }
 
@@ -310,7 +334,7 @@ export class ControllerManager {
                 return output.NgpDataSet["T_Result"];
             }
         } catch (ex: any) {
-            console.log(ex.Message);
+            console.error(ex.Message);
             // this.framework.logger.error(ex.Message);
             return undefined;
         }

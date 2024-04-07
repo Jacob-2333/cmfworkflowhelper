@@ -35,7 +35,7 @@ export class System {
         const currentDate = new Date();
         const currTimestamp = Math.floor(currentDate.getTime() / 1000);
 
-        this.cmf_access_token=null;
+        // this.cmf_access_token=null;
         if (!this.cmf_access_token || !this.cmf_access_token.access_token ||
             !this.cmf_access_token.expires_in || !this.cmf_access_token.timestamp
             || currTimestamp - this.cmf_access_token.timestamp > this.cmf_access_token.expires_in) {
@@ -60,21 +60,26 @@ export class System {
 
     public async call(input: any): Promise<any> {
         // console.log(JSON.stringify(input));
-        let type = input["$type"];
-        let tag1list = type.split('Management')[0].split('.');
-        let tag1 = tag1list[tag1list.length - 1];
-        let tag2list = type.split('InputObjects.');
-        let tag2 = tag2list[tag2list.length - 1].split('Input,')[0];
-
-        console.log("===============");
-        let url = `${this.cmf_access_token.host}/api/${tag1}/${tag2}`;
-        let output: any;
-        let tag3list = type.split('.');
-        if (tag3list[tag3list.length - 1].includes('Get')) {
-            output = await this.cmfToken.systemCallGet(url, input, this.cmf_access_token.access_token);
-        } else {
-            output = await this.cmfToken.systemCallPost(url, input, this.cmf_access_token.access_token);
+        try{
+            let type = input["$type"];
+            let tag1list = type.split('Management')[0].split('.');
+            let tag1 = tag1list[tag1list.length - 1];
+            let tag2list = type.split('InputObjects.');
+            let tag2 = tag2list[tag2list.length - 1].split('Input,')[0];
+    
+            console.log("===============");
+            let url = `${this.cmf_access_token.host}/api/${tag1}/${tag2}`;
+            let output: any;
+            let tag3list = type.split('.');
+            if (tag3list[tag3list.length - 1].includes('Get')) {
+                output = await this.cmfToken.systemCallGet(url, input, this.cmf_access_token.access_token);
+            } else {
+                output = await this.cmfToken.systemCallPost(url, input, this.cmf_access_token.access_token);
+            }
+            return output;
         }
-        return output;
+        catch(ex){
+            throw ex;
+        }
     }
 }

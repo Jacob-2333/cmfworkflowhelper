@@ -18,12 +18,8 @@
   "contributes": {
     "viewsWelcome": [
       {
-        "view": "nodeDependencies",
-        "contents": "No node dependencies found [learn more] (https://www.npmjs.com/).\n[Add Dependency](command:nodeDependencies.addEntry)"
-      },
-      {
         "view": "automationcontrollerlist",
-        "contents": "No AutomationController [learn more](https://www.npmjs.com/).\n[Config Token](command:automationcontrollerlist.configToken)\n[Load Controller](command:automationcontrollerlist.loadControllerList)"
+        "contents": "No AutomationController [learn more](https://www.npmjs.com/).\n[Config Host](command:automationcontrollerlist.hostEntry)\n[Config Access Token](command:automationcontrollerlist.tokenEntry)\n[Load Controller](command:automationcontrollerlist.loadControllerList)"
       }
     ],
     "viewsContainers": {
@@ -42,30 +38,6 @@
     },
     "commands": [
       {
-        "command": "nodeDependencies.refreshEntry",
-        "title": "MyRefresh",
-        "icon": {
-          "light": "resources/light/refresh.svg",
-          "dark": "resources/dark/refresh.svg"
-        }
-      },
-      {
-        "command": "nodeDependencies.addEntry",
-        "title": "Add"
-      },
-      {
-        "command": "nodeDependencies.editEntry",
-        "title": "Edit",
-        "icon": {
-          "light": "resources/light/edit.svg",
-          "dark": "resources/dark/edit.svg"
-        }
-      },
-      {
-        "command": "nodeDependencies.deleteEntry",
-        "title": "Delete"
-      },
-      {
         "command": "automationcontrollerlist.loadControllerList",
         "title": "LoadControllerList"
       },
@@ -77,17 +49,29 @@
         "command": "automationcontrollerlist.saveEntry",
         "title": "Save",
         "icon": "resources/save.svg"
+      },
+      {
+        "command": "automationcontrollerlist.refreshEntry",
+        "title": "Refresh",
+        "icon": "resources/refresh.svg"
+      },
+      {
+        "command": "automationcontrollerlist.searchEntry",
+        "title": "Search",
+        "icon": "resources/search.svg"
+      },
+      {
+        "command": "automationcontrollerlist.tokenEntry",
+        "title": "Access Token",
+        "icon": "resources/access_token.svg"
+      },
+      {
+        "command": "automationcontrollerlist.hostEntry",
+        "title": "Host",
+        "icon": "resources/domain.svg"
       }
     ],
     "views": {
-      "package-explorer": [
-        {
-          "id": "nodeDependencies",
-          "name": "Node Dependencies",
-          "icon": "resources/test.svg",
-          "contextualTitle": "Package Explorer"
-        }
-      ],
       "iot-workflow-code-editor": [
         {
           "id": "automationcontrollerlist",
@@ -100,25 +84,27 @@
     "menus": {
       "view/title": [
         {
-          "command": "nodeDependencies.refreshEntry",
-          "when": "view == nodeDependencies",
+          "command": "automationcontrollerlist.refreshEntry",
+          "when": "view == automationcontrollerlist",
           "group": "navigation"
         },
         {
-          "command": "nodeDependencies.addEntry",
-          "when": "view == nodeDependencies"
+          "command": "automationcontrollerlist.searchEntry",
+          "when": "view == automationcontrollerlist",
+          "group": "navigation"
+        },
+        {
+          "command": "automationcontrollerlist.tokenEntry",
+          "when": "view == automationcontrollerlist",
+          "group": "navigation"
+        },
+        {
+          "command": "automationcontrollerlist.hostEntry",
+          "when": "view == automationcontrollerlist",
+          "group": "navigation"
         }
       ],
       "view/item/context": [
-        {
-          "command": "nodeDependencies.editEntry",
-          "when": "view == nodeDependencies",
-          "group": "inline"
-        },
-        {
-          "command": "nodeDependencies.deleteEntry",
-          "when": "view == nodeDependencies"
-        },
         {
           "command": "automationcontrollerlist.saveEntry",
           "when": "view == automationcontrollerlist && viewItem == codetask",
