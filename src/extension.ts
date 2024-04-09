@@ -3,7 +3,6 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { CmfToken } from './cmftoken';
 import { LocalFramework } from './localFramework';
 import { ControllerManager } from './AutomationController/controllerManager';
 import { ControllerProvider } from './AutomationController/controllerProvider';
@@ -68,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		// 删除_tempCodeFiles文件夹下所有缓存的文件
 		// 防止误删上级目录
-		let dirPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles');
+		let dirPath = path.join(__filename, '..', '..', '_tempCodeFiles');
 		// if (!dirPath.startsWith(process.cwd())) {
 		vscode.window.showInformationMessage(`Clear directory path: ${dirPath}`);
 		// throw new Error("Invalid directory path");
@@ -117,6 +116,7 @@ export function activate(context: vscode.ExtensionContext) {
 				console.log(JSON.stringify(cmf_access_token));
 				// 写入数据
 				context.globalState.update('cmf_access_token', cmf_access_token);
+				await localFramework.system.refresh();
 				// console.log(`Key words for searching 'AutomationController': ${searchInputContext}`);
 			}
 		} else {
@@ -138,6 +138,7 @@ export function activate(context: vscode.ExtensionContext) {
 				console.log(JSON.stringify(cmf_access_token));
 				// 写入数据
 				context.globalState.update('cmf_access_token', cmf_access_token);
+				await localFramework.system.refresh();
 				// console.log(`Key words for searching 'AutomationController': ${searchInputContext}`);
 			}
 		} else {
@@ -149,7 +150,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable3 = vscode.commands.registerCommand('automationcontrollerlist.loadControllerList', () => { refreshControllerList(true); });
 
 	let disposable4 = vscode.commands.registerCommand('automationcontrollerlist.customOpenFile', async (body, id, filePath, _self) => {
-		let fileFullPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles', filePath);
+		let fileFullPath = path.join(__filename, '..', '..', '_tempCodeFiles', filePath);
 		// _self.contextValue="codetask_selected";
 		console.log(fileFullPath);
 		// vscode.window.showInformationMessage(`${fileFullPath}`);
@@ -193,7 +194,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 	let disposable5 = vscode.commands.registerCommand('automationcontrollerlist.saveEntry', async (treeView) => {
 		// vscode.window.showInformationMessage('automationcontrollerlist.saveEntry');
-		let fileFullPath = path.join(__filename, '..', '..', 'src', '_tempCodeFiles', treeView.filePath);
+		let fileFullPath = path.join(__filename, '..', '..', '_tempCodeFiles', treeView.filePath);
 
 		let activeTextEditor = vscode.window.activeTextEditor;
 		if (activeTextEditor) {

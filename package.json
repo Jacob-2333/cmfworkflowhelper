@@ -2,7 +2,7 @@
   "name": "cmfworkflowhelper",
   "displayName": "CMFWorkflowHelper",
   "description": "An extension for Workflow editing and will be used in CMF MES",
-  "version": "0.0.1",
+  "version": "0.0.8",
   "engines": {
     "vscode": "^1.87.0"
   },
@@ -139,12 +139,16 @@
     "@typescript-eslint/parser": "^7.0.2",
     "@vscode/test-cli": "^0.0.6",
     "@vscode/test-electron": "^2.3.9",
-    "eslint": "^8.56.0",
-    "typescript": "^5.3.3"
+    "eslint": "^8.56.0"
   },
   "dependencies": {
+    "@criticalmanufacturing/connect-iot-controller-engine": "^10.1.3-202310266",
     "@types/axios": "^0.14.0",
     "axios": "^1.6.8",
-    "cmf-lbos": "file:./src/cmf-lbos"
-  }
+    "cmf-lbos": "^10.1.3-20231026.4",
+    "typescript": "^5.4.4",
+    "framework": "1.0.0"
+  },
+  "author": "ccland",
+  "license": "MIT"
 }

@@ -47,7 +47,7 @@ export class ControllerProvider implements vscode.TreeDataProvider<Controller> {
 
                         // //----------------------test
 
-                        // let fileFullPath = path.join(__filename, '..', '..', '..', 'src', '_others', "test6.json");
+                        // let fileFullPath = path.join(__filename, '..', '..', '..', '_others', "test6.json");
                         // fs.promises.writeFile(fileFullPath, JSON.stringify(controller.AutomationController));
                         // //----------------------test
 

@@ -1,0 +1,21 @@
+{
+    "name": "framework",
+    "version": "1.0.0",
+    "description": "A package providing TypeScript type definitions",
+    "main": "src/index.d.ts", 
+    "types": "src/index.d.ts", 
+    "files": [
+      "src/index.d.ts" 
+    ],
+    "repository": {
+      "type": "git",
+      "url": ""
+    },
+    "keywords": [
+      "typescript",
+      "typings",
+      "definitions"
+    ],
+    "author": "ccland",
+    "license": "MIT"
+  }

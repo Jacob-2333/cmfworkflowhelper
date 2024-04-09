@@ -53,7 +53,7 @@ export class ControllerManager {
                 input.FullUpdateParameters.WorkflowsToUpdate.push(_wf);
             }
             // input.FullUpdateParameters.WorkflowsToUpdate=automationController.Workflows;
-            // let fileFullPath = path.join(__filename, '..', '..', '..', 'src', '_others', "test5.json");
+            // let fileFullPath = path.join(__filename, '..', '..', '..', '_others', "test5.json");
             // await fs.promises.writeFile(fileFullPath, JSON.stringify(input));
             let output = await this.framework.system.call(input);
             return output;

@@ -58,6 +58,10 @@ export class System {
         // console.log(messagebus_token);
     }
 
+    public async refresh(){
+        this.cmf_access_token = this.context.globalState.get('cmf_access_token');
+    }
+
     public async call(input: any): Promise<any> {
         // console.log(JSON.stringify(input));
         try{
